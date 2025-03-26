@@ -56,13 +56,12 @@ const GameScreen = () => {
                 setTeamPercents({ alpha: '0%', beta: '0%' });
             }
 
-            // Mettre à jour les spamTexts avec les joueurs actifs
             const newSpamTexts = activePlayers.map(player => ({
                 id: Date.now() + Math.random(),
                 pseudo: player.pseudo,
                 team: player.team,
-                left: Math.random() * 80, // Position horizontale aléatoire (0-80%)
-                top: Math.random() * 120 // Position verticale aléatoire (0-120px)
+                left: Math.random() * 80,
+                top: Math.random() * 120 
             }));
             setSpamTexts(newSpamTexts);
         });
@@ -84,16 +83,14 @@ const GameScreen = () => {
                 await incrementTeamScore(team as 'alpha' | 'beta');
                 await incrementPlayerScore(pseudo as string);
 
-                // Ajouter le pseudo du joueur qui clique aux spamTexts avec position aléatoire
                 setSpamTexts(prev => [...prev, {
                     id: Date.now() + Math.random(),
                     pseudo: pseudo,
                     team: team,
-                    left: Math.random() * 80, // Position horizontale aléatoire (0-80%)
-                    top: Math.random() * 120 // Position verticale aléatoire (0-120px)
+                    left: Math.random() * 80,
+                    top: Math.random() * 120
                 }]);
 
-                // Animation d'apparition
                 Animated.parallel([
                     Animated.timing(fadeAnim, {
                         toValue: 1,
@@ -163,13 +160,13 @@ const GameScreen = () => {
                 // Animation des curseurs qui cliquent
                 const newClickingCursors = new Set<number>();
                 autoCursors.forEach(cursorId => {
-                    if (Math.random() > 0.5) { // 50% de chance qu'un curseur clique
+                    if (Math.random() > 0.5) { 
                         newClickingCursors.add(cursorId);
                     }
                 });
                 setClickingCursors(newClickingCursors);
                 
-                // Réinitialiser les curseurs qui cliquent après une courte durée
+                
                 setTimeout(() => {
                     setClickingCursors(new Set());
                 }, 200);
@@ -179,11 +176,10 @@ const GameScreen = () => {
         return () => clearInterval(autoClickInterval);
     }, [autoCursors]);
 
-    // Effet pour supprimer les textes après leur animation
     useEffect(() => {
         const textTimeout = setTimeout(() => {
             setSpamTexts(prev => prev.slice(1));
-        }, 1000); // Supprime le texte après 1 seconde
+        }, 1000);
 
         return () => clearTimeout(textTimeout);
     }, [spamTexts]);

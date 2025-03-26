@@ -1,50 +1,78 @@
-# Welcome to your Expo app 👋
+# Clicker Battle
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Un jeu de clics compétitif en temps réel où deux équipes s'affrontent pour atteindre la domination du clic !
 
-## Get started
+## À propos du jeu
 
-1. Install dependencies
+Clicker Battle est un jeu multijoueur en temps réel où les joueurs sont divisés en deux équipes : Alpha et Beta. Chaque joueur contribue au score de son équipe en cliquant sur un bouton. L'équipe avec le plus de clics domine la barre de progression.
 
-   ```bash
-   npm install
-   ```
+### Caractéristiques principales
 
-2. Start the app
+- **Compétition en temps réel** : Voyez la progression des équipes mise à jour instantanément
+- **Système de bonus** : Débloquez des auto-clickers après 10 clics manuels
+- **Interface réactive** : Animations fluides et retours visuels
+- **Visualisation des joueurs actifs** : Observez en temps réel qui contribue à chaque équipe
 
-   ```bash
-    npx expo start
-   ```
+## Comment jouer
 
-In the output, you'll find options to open the app in a
+1. Lancez l'application
+2. Entrez votre pseudo
+3. Choisissez votre équipe (Alpha ou Beta)
+4. Cliquez autant que possible pour faire gagner votre équipe
+5. Après 10 clics, vous pouvez activer un bonus d'auto-click
+6. Observez la barre de progression pour voir quelle équipe est en tête
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Technologies utilisées
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Frontend
+- **React Native** : Framework cross-platform pour le développement mobile
+- **Expo** : Plateforme pour simplifier le développement React Native
+- **React Navigation** : Navigation entre les écrans de l'application
+- **Reanimated** : Animations fluides pour l'interface utilisateur
 
-## Get a fresh project
+### Backend
+- **Firebase** : 
+  - **Firestore** : Base de données NoSQL en temps réel
+  - **Authentification** : Gestion des utilisateurs (pseudo)
 
-When you're ready, run:
+### Autres
+- **TypeScript** : Typage statique pour un code plus robuste
+- **Expo Router** : Navigation basée sur les fichiers
+
+## Installation et démarrage
+
+1. Clonez le dépôt
 
 ```bash
-npm run reset-project
+git clone [url-du-repo]
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Installez les dépendances
 
-## Learn more
+```bash
+npm install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+3. Lancez l'application
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npx expo start
+```
 
-## Join the community
+4. Scannez le QR code avec l'application Expo Go (disponible sur iOS et Android)
+   ou ouvrez-le dans un émulateur/simulateur
 
-Join our community of developers creating universal apps.
+## Structure du projet
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- `app/` : Pages et navigation de l'application
+- `lib/` : Services et utilitaires (Firebase)
+- `components/` : Composants réutilisables
+- `assets/` : Images et ressources statiques
+
+## Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à proposer des améliorations ou signaler des bugs.
+
+---
+
+Développé avec 💜 et 💚 par les équipes Alpha et Beta

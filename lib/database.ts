@@ -85,8 +85,7 @@ export const subscribeToScores = (callback: (data: {
         alpha: doc.data().alpha || 0,
         beta: doc.data().beta || 0
       };
-      
-      // Écouter les changements dans la collection des joueurs actifs
+  
       const unsubscribePlayers = onSnapshot(activePlayersRef, (snapshot) => {
         const activePlayers = snapshot.docs.map(doc => ({
           pseudo: doc.data().pseudo,
