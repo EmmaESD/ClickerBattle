@@ -9,7 +9,7 @@ const GameScreen = () => {
     const [teamPercents, setTeamPercents] = useState({ alpha: '0%', beta: '0%' });
     const [cursorPosition, setCursorPosition] = useState(0); 
     const [loading, setLoading] = useState(true);
-    const [spamTexts, setSpamTexts] = useState<Array<{id: number, pseudo: string, team: string}>>([]);
+    const [spamTexts, setSpamTexts] = useState<Array<{id: number, pseudo: string, team: string, left: number, top: number}>>([]);
     const [clickCount, setClickCount] = useState(0);
     const [autoCursors, setAutoCursors] = useState<number[]>([]);
     const [bonusCooldown, setBonusCooldown] = useState(false);
@@ -60,7 +60,9 @@ const GameScreen = () => {
             const newSpamTexts = activePlayers.map(player => ({
                 id: Date.now() + Math.random(),
                 pseudo: player.pseudo,
-                team: player.team
+                team: player.team,
+                left: Math.random() * 80, // Position horizontale aléatoire (0-80%)
+                top: Math.random() * 120 // Position verticale aléatoire (0-120px)
             }));
             setSpamTexts(newSpamTexts);
         });
@@ -82,11 +84,13 @@ const GameScreen = () => {
                 await incrementTeamScore(team as 'alpha' | 'beta');
                 await incrementPlayerScore(pseudo as string);
 
-                // Ajouter le pseudo du joueur qui clique aux spamTexts
+                // Ajouter le pseudo du joueur qui clique aux spamTexts avec position aléatoire
                 setSpamTexts(prev => [...prev, {
                     id: Date.now() + Math.random(),
                     pseudo: pseudo,
-                    team: team
+                    team: team,
+                    left: Math.random() * 80, // Position horizontale aléatoire (0-80%)
+                    top: Math.random() * 120 // Position verticale aléatoire (0-120px)
                 }]);
 
                 // Animation d'apparition
@@ -250,7 +254,7 @@ const GameScreen = () => {
             </View>
 
             <View style={styles.spamContainer}>
-                {spamTexts.map(({ id, pseudo, team }) => (
+                {spamTexts.map(({ id, pseudo, team, left, top }) => (
                     <Animated.Text
                         key={id}
                         style={[
@@ -259,6 +263,8 @@ const GameScreen = () => {
                             {
                                 opacity: fadeAnim,
                                 transform: [{ scale: scaleAnim }],
+                                left: `${left}%`,
+                                top: top
                             }
                         ]}
                     >
@@ -469,14 +475,13 @@ const styles = StyleSheet.create({
         textShadowRadius: 10,
         marginVertical: 5,
         position: 'absolute',
-        width: '100%',
-        left: 0,
-        right: 0,
+        width: 'auto', // Modifier pour que la largeur s'adapte au contenu
+        maxWidth: '40%', // Limiter la largeur maximale
         opacity: 0.8,
         fontFamily: "monospace",
     },
     alphaText: {
-        color: '#8A2BE2', // Violet
+        color: '#8A2BE2', 
         textShadowColor: '#50FFA0',
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 8,
