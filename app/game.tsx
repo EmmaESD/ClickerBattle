@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, ScrollView, Animated } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, ScrollView, Animated, Image } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { initializeScores, incrementTeamScore, incrementPlayerScore, subscribeToScores, addPlayer, addActivePlayer, removeActivePlayer } from "../lib/database";
 
 const GameScreen = () => {
     const [personalScore, setPersonalScore] = useState(0);
-    const [teamScores, setTeamScores] = useState({ blue: 0, red: 0 });
-    const [teamPercents, setTeamPercents] = useState({ blue: '0%', red: '0%' });
+    const [teamScores, setTeamScores] = useState({ alpha: 0, beta: 0 });
+    const [teamPercents, setTeamPercents] = useState({ alpha: '0%', beta: '0%' });
     const [cursorPosition, setCursorPosition] = useState(0); 
     const [loading, setLoading] = useState(true);
     const [spamTexts, setSpamTexts] = useState<Array<{id: number, pseudo: string, team: string}>>([]);
@@ -14,7 +14,8 @@ const GameScreen = () => {
     const [autoCursors, setAutoCursors] = useState<number[]>([]);
     const [bonusCooldown, setBonusCooldown] = useState(false);
     const [showBonusButton, setShowBonusButton] = useState(false);
-    const { pseudo, team } = useLocalSearchParams<{ pseudo: string, team: 'blue' | 'red' }>();
+    const [clickingCursors, setClickingCursors] = useState<Set<number>>(new Set());
+    const { pseudo, team } = useLocalSearchParams<{ pseudo: string, team: 'alpha' | 'beta' }>();
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const scaleAnim = useRef(new Animated.Value(0.5)).current;
 
@@ -24,8 +25,8 @@ const GameScreen = () => {
             try {
                 await initializeScores();
                 if (pseudo && team) {
-                    await addPlayer(pseudo as string, team as 'blue' | 'red');
-                    await addActivePlayer(pseudo as string, team as 'blue' | 'red');
+                    await addPlayer(pseudo as string, team as 'alpha' | 'beta');
+                    await addActivePlayer(pseudo as string, team as 'alpha' | 'beta');
                 }
                 setLoading(false);
             } catch (error) {
@@ -39,20 +40,20 @@ const GameScreen = () => {
         const unsubscribe = subscribeToScores(({ scores, activePlayers }) => {
             setTeamScores(scores);
             
-            const totalClicks = scores.blue + scores.red;
+            const totalClicks = scores.alpha + scores.beta;
             if (totalClicks > 0) {
-                const difference = scores.blue - scores.red;
+                const difference = scores.alpha - scores.beta;
                 const newPosition = difference / (totalClicks * 0.1); 
                 setCursorPosition(Math.max(-10, Math.min(10, newPosition)));
                 
-                const bluePercent = Math.round((scores.blue / totalClicks) * 100);
-                const redPercent = Math.round((scores.red / totalClicks) * 100);
+                const alphaPercent = Math.round((scores.alpha / totalClicks) * 100);
+                const betaPercent = Math.round((scores.beta / totalClicks) * 100);
                 setTeamPercents({
-                    blue: `${bluePercent}%`,
-                    red: `${redPercent}%`
+                    alpha: `${alphaPercent}%`,
+                    beta: `${betaPercent}%`
                 });
             } else {
-                setTeamPercents({ blue: '0%', red: '0%' });
+                setTeamPercents({ alpha: '0%', beta: '0%' });
             }
 
             // Mettre à jour les spamTexts avec les joueurs actifs
@@ -78,7 +79,7 @@ const GameScreen = () => {
         
         try {
             if (pseudo && team) {
-                await incrementTeamScore(team as 'blue' | 'red');
+                await incrementTeamScore(team as 'alpha' | 'beta');
                 await incrementPlayerScore(pseudo as string);
 
                 // Ajouter le pseudo du joueur qui clique aux spamTexts
@@ -154,6 +155,20 @@ const GameScreen = () => {
                 for (let i = 0; i < clicksPerInterval; i++) {
                     handleClick();
                 }
+                
+                // Animation des curseurs qui cliquent
+                const newClickingCursors = new Set<number>();
+                autoCursors.forEach(cursorId => {
+                    if (Math.random() > 0.5) { // 50% de chance qu'un curseur clique
+                        newClickingCursors.add(cursorId);
+                    }
+                });
+                setClickingCursors(newClickingCursors);
+                
+                // Réinitialiser les curseurs qui cliquent après une courte durée
+                setTimeout(() => {
+                    setClickingCursors(new Set());
+                }, 200);
             }
         }, 1000);
 
@@ -188,53 +203,51 @@ const GameScreen = () => {
         <View style={styles.container}>
             {showBonusButton && (
                 <TouchableOpacity 
-                    style={[styles.bonusButton, team === 'blue' ? styles.blueBonusButton : styles.redBonusButton]} 
+                    style={[styles.bonusButton, team === 'alpha' ? styles.alphaBonusButton : styles.betaBonusButton]} 
                     onPress={handleBonusClick}
                 >
                     <Text style={styles.bonusButtonText}>BONUS</Text>
                 </TouchableOpacity>
             )}
-            <Text style={styles.teamText}>Équipe: {team === 'blue' ? 'Bleue' : 'Rouge'}</Text>
+            <Text style={styles.teamText}>Équipe: {team === 'alpha' ? 'Alpha' : 'Beta'}</Text>
             <Text style={styles.scoreText}>Votre score: {personalScore}</Text>
             
             <View style={styles.cursorContainer}>
-                <View style={styles.blueZone}>
-                    <Text style={styles.teamScoreText}>{teamPercents.blue}</Text>
+                <View style={styles.alphaZone}>
+                    <Text style={styles.teamScoreText}>{teamPercents.alpha}</Text>
                 </View>
                 <View style={styles.cursorTrack}>
                     <View style={[styles.cursor, getCursorStyle()]} />
                 </View>
-                <View style={styles.redZone}>
-                    <Text style={styles.teamScoreText}>{teamPercents.red}</Text>
+                <View style={styles.betaZone}>
+                    <Text style={styles.teamScoreText}>{teamPercents.beta}</Text>
                 </View>
             </View>
 
             <TouchableOpacity 
-                style={[styles.button, team === 'blue' ? styles.blueTeam : styles.redTeam]} 
+                style={[styles.button, team === 'alpha' ? styles.alphaTeam : styles.betaTeam]} 
                 onPress={handleClick}
             >
                 <Text style={styles.buttonText}>Cliquez !</Text>
+            </TouchableOpacity>
+
+            <View style={styles.autoCursorsContainer}>
                 {autoCursors.map((cursorId, index) => {
-                    const angle = (index / autoCursors.length) * 2 * Math.PI;
-                    const radius = 40; // Distance du centre
-                    const x = Math.cos(angle) * radius;
-                    const y = Math.sin(angle) * radius;
+                    const isClicking = clickingCursors.has(cursorId);
                     
                     return (
-                        <View 
+                        <Text 
                             key={cursorId} 
                             style={[
                                 styles.autoCursor,
-                                {
-                                    transform: [{ translateX: x }, { translateY: y }],
-                                }
+                                team === 'alpha' ? styles.alphaCursor : styles.betaCursor,
                             ]} 
-                        />
+                        >
+                            {isClicking ? '👆' : '🖱️'}
+                        </Text>
                     );
                 })}
-            </TouchableOpacity>
-
-            
+            </View>
 
             <View style={styles.spamContainer}>
                 {spamTexts.map(({ id, pseudo, team }) => (
@@ -242,7 +255,7 @@ const GameScreen = () => {
                         key={id}
                         style={[
                             styles.spamText,
-                            team === 'blue' ? styles.blueText : styles.redText,
+                            team === 'alpha' ? styles.alphaText : styles.betaText,
                             {
                                 opacity: fadeAnim,
                                 transform: [{ scale: scaleAnim }],
@@ -263,24 +276,37 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         gap: 10,
-        backgroundColor: "#000",
+        backgroundColor: "#0A0A1A",
         padding: 20,
+        backgroundImage: "linear-gradient(180deg, #0A0A1A 0%, #101035 100%)",
     },
     welcomeText: {
-        color: "#fff",
+        color: "#E0FFFF",
         fontSize: 24,
         marginBottom: 10,
+        fontFamily: "monospace",
+        textShadowColor: '#50FFA0',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 8,
     },
     teamText: {
-        color: "#fff",
+        color: "#E0FFFF",
         fontSize: 18,
         marginBottom: 20,
+        fontFamily: "monospace",
+        textShadowColor: '#50FFA0',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 5,
     },
     scoreText: {
-        color: "#fff",
+        color: "#E0FFFF",
         fontSize: 30,
         fontWeight: "bold",
         marginBottom: 20,
+        fontFamily: "monospace",
+        textShadowColor: '#50FFA0',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 10,
     },
     cursorContainer: {
         flexDirection: "row",
@@ -288,84 +314,139 @@ const styles = StyleSheet.create({
         marginBottom: 40,
         width: "100%",
     },
-    blueZone: {
+    alphaZone: {
         width: 40,
         height: 40,
-        backgroundColor: "#007AFF",
+        backgroundColor: "#8A2BE2", // Violet
         borderRadius: 20,
         justifyContent: "center",
         alignItems: "center",
+        shadowColor: "#50FFA0",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 10,
+        elevation: 8,
     },
-    redZone: {
+    betaZone: {
         width: 40,
         height: 40,
-        backgroundColor: "#FF3B30",
+        backgroundColor: "#00FF7F", // Vert
         borderRadius: 20,
         justifyContent: "center",
         alignItems: "center",
+        shadowColor: "#8A2BE2",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 10,
+        elevation: 8,
     },
     cursorTrack: {
         flex: 1,
         height: 10,
-        backgroundColor: "#333",
+        backgroundColor: "#222244",
         borderRadius: 5,
         marginHorizontal: 10,
         position: "relative",
+        borderWidth: 1,
+        borderColor: "#303060",
+        shadowColor: "#50FFA0",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 3,
     },
     cursor: {
         width: 20,
         height: 20,
-        backgroundColor: "#fff",
+        backgroundColor: "#E0FFFF",
         borderRadius: 10,
         position: "absolute",
         top: -5,
         left: "50%",
         marginLeft: -10,
+        shadowColor: "#50FFA0",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 1,
+        shadowRadius: 10,
+        elevation: 8,
     },
     teamScoreText: {
-        color: "#fff",
+        color: "#E0FFFF",
         fontWeight: "bold",
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 3,
     },
     button: {
         paddingVertical: 15,
         paddingHorizontal: 30,
-        borderRadius: 8,
+        borderRadius: 15,
         alignItems: "center",
+        borderWidth: 2,
+        borderColor: "#E0FFFF",
+        shadowColor: "#50FFA0",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 15,
+        elevation: 8,
+        backdropFilter: "blur(10px)",
     },
-    blueTeam: {
-        backgroundColor: "#007AFF",
+    alphaTeam: {
+        backgroundColor: "rgba(138, 43, 226, 0.7)", // Violet transparent
+        borderColor: "#8A2BE2",
     },
-    redTeam: {
-        backgroundColor: "#FF3B30",
+    betaTeam: {
+        backgroundColor: "rgba(0, 255, 127, 0.7)", // Vert transparent
+        borderColor: "#00FF7F",
     },
     buttonText: {
-        color: "#fff",
+        color: "#E0FFFF",
         fontSize: 18,
         fontWeight: "bold",
+        fontFamily: "monospace",
+        textShadowColor: '#222244',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 3,
     },
     bonusButton: {
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 8,
+        borderRadius: 15,
         alignItems: "center",
         marginTop: 15,
         borderWidth: 2,
-        borderColor: '#FFFFFF',
+        borderColor: '#E0FFFF',
+        shadowColor: "#50FFA0",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 10,
+        elevation: 8,
+        backdropFilter: "blur(10px)",
     },
-    blueBonusButton: {
-        backgroundColor: "#007AFF",
+    alphaBonusButton: {
+        backgroundColor: "rgba(138, 43, 226, 0.7)", // Violet transparent
+        borderColor: "#8A2BE2",
     },
-    redBonusButton: {
-        backgroundColor: "#FF3B30",
+    betaBonusButton: {
+        backgroundColor: "rgba(0, 255, 127, 0.7)", // Vert transparent
+        borderColor: "#00FF7F",
     },
     bonusButtonText: {
-        color: "#fff",
+        color: "#E0FFFF",
         fontSize: 16,
         fontWeight: "bold",
+        fontFamily: "monospace",
+        textShadowColor: '#222244',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 3,
     },
     loadingText: {
-        color: "#fff",
+        color: "#E0FFFF",
         marginTop: 10,
+        fontFamily: "monospace",
+        textShadowColor: '#50FFA0',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 5,
     },
     spamContainer: {
         marginTop: 20,
@@ -392,24 +473,41 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         opacity: 0.8,
+        fontFamily: "monospace",
     },
-    blueText: {
-        color: '#007AFF',
+    alphaText: {
+        color: '#8A2BE2', // Violet
+        textShadowColor: '#50FFA0',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 8,
     },
-    redText: {
-        color: '#FF3B30',
+    betaText: {
+        color: '#00FF7F', // Vert
+        textShadowColor: '#8A2BE2',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 8,
     },
     autoCursor: {
-        position: 'absolute',
-        width: 20,
-        height: 20,
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        opacity: 0.5,
-        left: '50%',
-        top: '50%',
-        marginLeft: -10,
-        marginTop: -10,
+        fontSize: 24,
+        opacity: 0.8,
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 8,
+        marginHorizontal: 5,
+    },
+    autoCursorsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20,
+        paddingHorizontal: 10,
+        maxWidth: '100%',
+    },
+    alphaCursor: {
+        textShadowColor: "#8A2BE2", // Violet pour l'équipe Alpha
+    },
+    betaCursor: {
+        textShadowColor: "#00FF7F", // Vert pour l'équipe Beta
     },
 })
  
