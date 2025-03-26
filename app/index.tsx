@@ -29,7 +29,7 @@ const HomeScreen = () => {
         }
     };
 
-    const handleTeamChoice = (team: 'blue' | 'red') => {
+    const handleTeamChoice = (team: 'alpha' | 'beta') => {
         console.log(`Pseudo: ${pseudo}, Équipe: ${team}`);
        
         router.push({
@@ -72,16 +72,16 @@ const HomeScreen = () => {
                     <Text style={styles.teamTitle}>Choisissez votre équipe</Text>
                     <View style={styles.teamButtons}>
                         <TouchableOpacity 
-                            style={[styles.teamButton, styles.blueTeam]} 
-                            onPress={() => handleTeamChoice('blue')}
+                            style={[styles.teamButton, styles.alphaTeam]} 
+                            onPress={() => handleTeamChoice('alpha')}
                         >
-                            <Text style={styles.teamButtonText}>Équipe Bleue</Text>
+                            <Text style={styles.teamButtonText}>Équipe Alpha</Text>
                         </TouchableOpacity> 
                         <TouchableOpacity 
-                            style={[styles.teamButton, styles.redTeam]} 
-                            onPress={() => handleTeamChoice('red')}
+                            style={[styles.teamButton, styles.betaTeam]} 
+                            onPress={() => handleTeamChoice('beta')}
                         >
-                            <Text style={styles.teamButtonText}>Équipe Rouge</Text>
+                            <Text style={styles.teamButtonText}>Équipe Beta</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -95,13 +95,18 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#000",
+        backgroundColor: "#0A0A1A",
+        backgroundImage: "linear-gradient(180deg, #0A0A1A 0%, #101035 100%)",
     },
     title: {
-        color: "#fff",
-        fontSize: 24,
+        color: "#E0FFFF",
+        fontSize: 28,
         marginBottom: 30,
         textAlign: "center",
+        fontFamily: "monospace",
+        textShadowColor: '#50FFA0',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 10,
     },
     formContainer: {
         width: "80%",
@@ -110,35 +115,62 @@ const styles = StyleSheet.create({
     input: {
         width: "100%",
         height: 50,
-        backgroundColor: "#fff",
-        borderRadius: 8,
+        backgroundColor: "rgba(224, 255, 255, 0.1)",
+        borderRadius: 15,
         paddingHorizontal: 15,
         marginBottom: 20,
         fontSize: 16,
+        color: "#E0FFFF",
+        borderWidth: 1,
+        borderColor: "#50FFA0",
+        fontFamily: "monospace",
+        shadowColor: "#50FFA0",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.5,
+        shadowRadius: 10,
+        elevation: 5,
     },
     button: {
-        backgroundColor: "#007AFF",
+        backgroundColor: "rgba(138, 43, 226, 0.7)", // Violet transparent
         paddingVertical: 12,
         paddingHorizontal: 30,
-        borderRadius: 8,
+        borderRadius: 15,
+        borderWidth: 2,
+        borderColor: "#8A2BE2",
+        shadowColor: "#50FFA0",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 10,
+        elevation: 5,
+        backdropFilter: "blur(10px)",
     },
     buttonDisabled: {
-        backgroundColor: "#666",
+        backgroundColor: "rgba(102, 102, 102, 0.3)",
+        borderColor: "#444",
+        shadowOpacity: 0.2,
     },
     buttonText: {
-        color: "#fff",
+        color: "#E0FFFF",
         fontSize: 16,
         fontWeight: "bold",
+        fontFamily: "monospace",
+        textShadowColor: '#222244',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 3,
     },
     teamContainer: {
         width: "80%",
         alignItems: "center",
     },
     teamTitle: {
-        color: "#fff",
-        fontSize: 20,
+        color: "#E0FFFF",
+        fontSize: 22,
         marginBottom: 30,
         textAlign: "center",
+        fontFamily: "monospace",
+        textShadowColor: '#50FFA0',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 8,
     },
     teamButtons: {
         width: "100%",
@@ -146,23 +178,40 @@ const styles = StyleSheet.create({
     },
     teamButton: {
         paddingVertical: 15,
-        borderRadius: 8,
+        borderRadius: 15,
         alignItems: "center",
+        borderWidth: 2,
+        shadowColor: "#50FFA0",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 15,
+        elevation: 8,
+        backdropFilter: "blur(10px)",
     },
-    blueTeam: {
-        backgroundColor: "#007AFF",
+    alphaTeam: {
+        backgroundColor: "rgba(138, 43, 226, 0.7)", // Violet transparent
+        borderColor: "#8A2BE2", 
     },
-    redTeam: {
-        backgroundColor: "#FF3B30",
+    betaTeam: {
+        backgroundColor: "rgba(0, 255, 127, 0.7)", // Vert transparent
+        borderColor: "#00FF7F",
     },
     teamButtonText: {
-        color: "#fff",
+        color: "#E0FFFF", 
         fontSize: 18,
         fontWeight: "bold",
+        fontFamily: "monospace",
+        textShadowColor: '#222244',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 3,
     },
     loadingText: {
-        color: "#fff",
+        color: "#E0FFFF",
         marginTop: 10,
+        fontFamily: "monospace",
+        textShadowColor: '#50FFA0',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 5,
     }
 });
 

@@ -32,20 +32,20 @@ export const initializeScores = async () => {
   const docSnap = await getDoc(scoresRef);
   if (!docSnap.exists()) {
     await setDoc(scoresRef, {
-      blue: 0,
-      red: 0,
+      alpha: 0,
+      beta: 0,
       players: {}
     });
   }
 };
 
-export const incrementTeamScore = async (team: 'blue' | 'red') => {
+export const incrementTeamScore = async (team: 'alpha' | 'beta') => {
   await updateDoc(scoresRef, {
     [team]: increment(1)
   });
 };
 
-export const addPlayer = async (pseudo: string, team: 'blue' | 'red') => {
+export const addPlayer = async (pseudo: string, team: 'alpha' | 'beta') => {
   await updateDoc(scoresRef, {
     [`players.${pseudo}`]: {
       team,
@@ -61,7 +61,7 @@ export const incrementPlayerScore = async (pseudo: string) => {
   });
 };
 
-export const addActivePlayer = async (pseudo: string, team: 'blue' | 'red') => {
+export const addActivePlayer = async (pseudo: string, team: 'alpha' | 'beta') => {
   const playerRef = doc(activePlayersRef, pseudo);
   await setDoc(playerRef, {
     pseudo,
@@ -76,14 +76,14 @@ export const removeActivePlayer = async (pseudo: string) => {
 };
 
 export const subscribeToScores = (callback: (data: { 
-  scores: { blue: number, red: number },
-  activePlayers: Array<{ pseudo: string, team: 'blue' | 'red' }>
+  scores: { alpha: number, beta: number },
+  activePlayers: Array<{ pseudo: string, team: 'alpha' | 'beta' }>
 }) => void) => {
   const unsubscribeScores = onSnapshot(scoresRef, (doc) => {
     if (doc.exists()) {
       const scores = {
-        blue: doc.data().blue || 0,
-        red: doc.data().red || 0
+        alpha: doc.data().alpha || 0,
+        beta: doc.data().beta || 0
       };
       
       // Écouter les changements dans la collection des joueurs actifs
