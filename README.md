@@ -44,7 +44,7 @@ Clicker Battle est un jeu multijoueur en temps réel où les joueurs sont divis�
 1. Clonez le dépôt
 
 ```bash
-git clone [url-du-repo]
+git clone https://github.com/EmmaESD/ClickerBattle.git
 ```
 
 2. Installez les dépendances
@@ -56,11 +56,42 @@ npm install
 3. Lancez l'application
 
 ```bash
-npx expo start
+npm start
 ```
 
 4. Scannez le QR code avec l'application Expo Go (disponible sur iOS et Android)
    ou ouvrez-le dans un émulateur/simulateur
+
+## Configuration Firebase personnalisée
+
+Pour utiliser votre propre backend Firebase avec cette application :
+
+1. Créez un projet sur [Firebase Console](https://console.firebase.google.com/)
+
+2. Activez Firestore Database dans votre projet Firebase
+
+3. Remplacez la configuration Firebase dans le fichier `lib/database.ts` :
+```typescript
+const firebaseConfig = {
+  apiKey: "VOTRE_API_KEY",
+  authDomain: "VOTRE_AUTH_DOMAIN",
+  projectId: "VOTRE_PROJECT_ID",
+  storageBucket: "VOTRE_STORAGE_BUCKET",
+  messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
+  appId: "VOTRE_APP_ID"
+};
+```
+
+4. Créez la structure de base de données suivante dans Firestore :
+   - Une collection `game` avec un document `scores` contenant :
+     ```
+     {
+       alpha: 0,
+       beta: 0,
+       players: {}
+     }
+     ```
+   - Une collection `activePlayers` qui stockera les joueurs en ligne
 
 ## Structure du projet
 
@@ -69,10 +100,5 @@ npx expo start
 - `components/` : Composants réutilisables
 - `assets/` : Images et ressources statiques
 
-## Contribution
-
-Les contributions sont les bienvenues ! N'hésitez pas à proposer des améliorations ou signaler des bugs.
-
----
-
-Développé avec 💜 et 💚 par les équipes Alpha et Beta
+#
+Développé avec 💜 et 💚 par Emma VAYSSE
